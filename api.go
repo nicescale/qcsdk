@@ -16,8 +16,7 @@ import (
 )
 
 const (
-	EndPoint              = "https://api.qingcloud.com/iaas/"
-	Zones                 = "sh1a"
+	DefaultEndPoint       = "https://api.qingcloud.com/iaas/"
 	DefaultJobWaitTimeout = 30
 )
 
@@ -62,22 +61,28 @@ type Request struct {
 }
 
 type Api struct {
-	Ak     string
-	Sk     string
-	Zone   string
-	Debug  bool
-	client *http.Client
+	Ak       string
+	Sk       string
+	Zone     string
+	Debug    bool
+	endpoint string
+	client   *http.Client
 }
 
 func NewApi(ak, sk, zone string) *Api {
 	return &Api{
-		Ak:   ak,
-		Sk:   sk,
-		Zone: zone,
+		Ak:       ak,
+		Sk:       sk,
+		Zone:     zone,
+		endpoint: DefaultEndPoint,
 		client: &http.Client{
 			Timeout: time.Second * 50,
 		},
 	}
+}
+
+func (api *Api) SetEndpoint(ep string) {
+	api.endpoint = ep
 }
 
 func (api *Api) SetDebug(dbg bool) {
@@ -126,7 +131,7 @@ func (api *Api) sign(params Params) {
 // out must be a pointer to a struct that embeds a types.ResponseStatus struct.
 func (api *Api) SendRequest(req *Request, out interface{}) error {
 	api.sign(req.Params)
-	url := EndPoint + "?" + req.String()
+	url := api.endpoint + "?" + req.String()
 	resp, err := api.client.Get(url)
 	if err != nil {
 		return err
