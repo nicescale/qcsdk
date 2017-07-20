@@ -109,7 +109,9 @@ func (api *Api) commonParams(action string) Params {
 	params["time_stamp"] = time.Now().UTC().Format("2006-01-02T15:04:05Z")
 	params["action"] = action
 	params["access_key_id"] = api.Ak
-	params["zone"] = api.Zone
+	if api.Zone != "" {
+		params["zone"] = api.Zone
+	}
 	params["version"] = "1"
 	params["signature_version"] = "1"
 	params["signature_method"] = "HmacSHA256"
