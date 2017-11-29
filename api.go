@@ -3,6 +3,7 @@ package qcsdk
 import (
 	"crypto/hmac"
 	"crypto/sha256"
+	"crypto/tls"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -87,6 +88,14 @@ func (api *Api) SetEndpoint(ep string) {
 
 func (api *Api) SetDebug(dbg bool) {
 	api.Debug = dbg
+}
+
+func (api *Api) TLSVerify(enable bool) {
+	api.client.Transport = &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: !enable,
+		},
+	}
 }
 
 func (api *Api) debug(fmt string, args ...interface{}) {
